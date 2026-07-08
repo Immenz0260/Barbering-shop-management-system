@@ -1,0 +1,22 @@
+# ---------- Python / Backend ----------
+.venv/
+venv/
+__pycache__/
+*.pyc
+backend/.env
+
+# ---------- Node / Frontend ----------
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# ---------- Environment files (extra safety net) ----------
+.env
+*.env
+
+# ---------- Editor/OS clutter ----------
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ---------- Alembic (keep versions, ignore nothing extra needed here) ----------
