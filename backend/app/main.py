@@ -4,12 +4,12 @@ from .database import engine, Base
 from . import models # this imports the matters - it registers all your table definitions with SQLAlchemy's Base
 from .routers import users, barbers, services, bookings, dashboard
 import os
-from dotenv import load_dontenv
+from dotenv import load_dotenv
 
 # Create all tables defined in models.py (only creates if they don't already exist)
 Base.metadata.create_all(bind=engine)
 
-load_dontenv()
+load_dotenv()
 
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 
