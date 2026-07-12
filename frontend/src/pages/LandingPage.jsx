@@ -86,6 +86,60 @@ function LandingPage() {
     </div>
   </div>
 </section>
+
+{/* Services section: grid of cards, "What We Offer" label + heading pattern repeats across sections */}
+<section id="services" className="max-w-6xl mx-auto px-6 py-24">
+  <div className="mb-16">
+    <p className="text-primary text-xs tracking-[0.3em] uppercase mb-3">What We Offer</p>
+    <h2
+      style={{ fontFamily: "'Playfair Display', serif" }}
+      className="text-5xl font-semibold"
+    >
+      Services
+    </h2>
+  </div>
+
+  {/* gap-px + bg-border creates thin hairline dividers between cards, since each card sits on the border color */}
+  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {services.map((service) => (
+      <div key={service.id} className="bg-card border border-border p-8 hover:bg-secondary transition-colors">
+        <div className="flex justify-between items-start mb-4">
+          <h3
+            style={{ fontFamily: "'Playfair Display', serif" }}
+            className="text-xl font-medium leading-tight max-w-[180px]"
+          >
+            {service.name}
+          </h3>
+        </div>
+        <p className="text-muted-foreground text-sm leading-relaxed mb-5">
+          {service.description}
+        </p>
+        <div className="flex items-center gap-4 text-sm">
+          {service.available_for_adult &&(
+            <span style={{ fontFamily: "'DM Mono', monospace" }} className="text-primary font-medium">
+              Adult: GHS {service.adult_price}
+            </span>
+          )}
+
+          {service.available_for_child &&(
+            <span style={{ fontFamily: "'DM Mono', monospace" }} className="text-primary font-medium">
+              Child: GHS {service.child_price}
+            </span>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div className="mt-10 flex justify-end">
+    <Link
+      to="/booking"
+      className="px-8 py-3.5 bg-primary text-primary-foreground text-sm tracking-[0.25em] uppercase hover:opacity-90 transition-opacity"
+    >
+      Book a Service
+    </Link>
+  </div>
+</section>
     </div>
   );
 }
