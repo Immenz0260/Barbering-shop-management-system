@@ -45,6 +45,7 @@ class BarberCreate(BaseModel):
 class BarberResponse(BaseModel):
     id: int
     user_id: int
+    barber_name: str
     specialty: Optional[str] = None
     bio: Optional[str] = None
     is_active: bool
