@@ -61,10 +61,10 @@ print(f"Barber profiles ready: {len(created_barbers)}")
 # ---------- Services ----------
 
 services_data = [
-    {"name": "Haircut", "adult_price": 30, "child_price": 20, "duration_minutes": 30, "description": "Classic haircut and shape-up"},
-    {"name": "Beard Trim", "adult_price": 15, "child_price": 15, "duration_minutes": 15, "description": "Beard shaping and grooming"},
-    {"name": "Haircut + Beard Combo", "adult_price": 40, "child_price": 30, "duration_minutes": 45, "description": "Full haircut and beard grooming package"},
-    {"name": "Kids Cut", "adult_price": 20, "child_price": 20, "duration_minutes": 20, "description": "Haircut tailored for children"},
+    {"name": "Haircut", "adult_price": 30, "child_price": 20, "duration_minutes": 30, "description": "Classic haircut and shape-up", "available_for_adult": True, "available_for_child": True},
+    {"name": "Beard Trim", "adult_price": 15, "child_price": 15, "duration_minutes": 15, "description": "Beard shaping and grooming", "available_for_adult": True, "available_for_child": False},
+    {"name": "Haircut + Beard Combo", "adult_price": 40, "child_price": 30, "duration_minutes": 45, "description": "Full haircut and beard grooming package", "available_for_adult": True, "available_for_child": False},
+    {"name": "Kids Cut", "adult_price": 20, "child_price": 20, "duration_minutes": 20, "description": "Haircut tailored for children", "available_for_adult": False, "available_for_child": True},
 ]
 
 created_services = []

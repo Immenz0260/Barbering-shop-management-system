@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Scissors, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 function Navbar() {
   const [open, setOpen] = useState(false);
@@ -9,34 +10,40 @@ function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5">
-          <Scissors size={25} className="text-primary" />
+          <Scissors size={20} className="text-primary" />
           <span
             style={{ fontFamily: "'Playfair Display', serif" }}
-            className="text-4xl font-semibold tracking-wider text-foreground"
+            className="text-2xl font-semibold tracking-wider text-foreground"
           >
-            ESARPS
+            ESARPS PREMIUM CUTS
           </span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
           <Link
             to="/"
-            className="text-xl tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors"
+            className="text-base tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors"
           >
             Home
           </Link>
           <Link
             to="/booking"
-            className="px-6 py-2.5 bg-primary text-primary-foreground text-xl tracking-[0.2em] uppercase hover:opacity-90 transition-opacity"
+            className="px-6 py-2.5 bg-primary text-primary-foreground text-base tracking-[0.2em] uppercase hover:opacity-90 transition-opacity"
           >
             Book Now
           </Link>
           <Link
             to="/login"
-            className="text-xl text-muted-foreground tracking-[0.2em] uppercase hover:text-foreground transition-colors"
+            className="text-base text-muted-foreground tracking-[0.2em] uppercase hover:text-foreground transition-colors"
           >
             Login
           </Link>
+
+          <Link 
+           to="/signup"
+            className="text-base text-muted-foreground tracking-[0.2em] uppercase hover:text-foreground transition-colors">
+          Sign Up</Link>
+
         </div>
 
         <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>

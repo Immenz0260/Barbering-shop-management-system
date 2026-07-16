@@ -11,7 +11,7 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     phone: Optional[str] = None
-    role: RoleEnum = RoleEnum.customer  # default role is customer if not specified
+#   role: RoleEnum = RoleEnum.customer (role is removed — public users cannot choose) # default role is customer if not specified
 
 # What the cient sends when logging in
 class UserLogin(BaseModel):
@@ -25,7 +25,7 @@ class UserResponse(BaseModel):
     email: EmailStr
     role: RoleEnum
 
-class config:
+class Config:
     from_attributes = True
 
 class Token(BaseModel):
@@ -37,10 +37,12 @@ class Token(BaseModel):
 #................Barber Schemas..............
 
 class BarberCreate(BaseModel):
-    user_id: int      # the existing user (role='barber) to attach a profile to 
+    full_name: str
+    email: EmailStr
+    password: str
+    phone: Optional[str] = None
     specialty: Optional[str] = None
     bio: Optional[str] = None
-
 
 class BarberResponse(BaseModel):
     id: int
@@ -63,6 +65,8 @@ class ServiceCreate(BaseModel):
     child_price: float
     duration_minutes: int
     description: Optional[str] = None
+    available_for_adult: bool = True
+    available_for_child: bool = True
 
 class ServiceResponse(BaseModel):
     id: int
@@ -71,6 +75,8 @@ class ServiceResponse(BaseModel):
     child_price: float
     duration_minutes: int
     description: Optional[str] = None
+    available_for_adult: bool
+    available_for_child: bool
 
     class Config:
         from_attributes = True
@@ -172,3 +178,9 @@ class CustomerDetail(BaseModel):
 class CustomerListResponse(BaseModel):
     customers: list[CustomerDetail]
 
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
