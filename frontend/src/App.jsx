@@ -6,7 +6,9 @@ import SignupPage from "./pages/SignupPage";
 import { AuthProvider } from "./context/AuthContext";
 import ForgotPasswordPage from "./pages/FogotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import BookingPage from "./pages/BookingPage";   
+import BookingPage from "./pages/BookingPage";  
+import ProtectedRoute from "./components/ProtectedRoute";  
+import DashboardPage from "./pages/DashboardPage";  
 
 function App() {
   return (
@@ -20,6 +22,14 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage/>} />
           <Route path="/reset-password" element={<ResetPasswordPage/>} />
           <Route path="/booking" element={<BookingPage />} />
+          <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={["owner"]}>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

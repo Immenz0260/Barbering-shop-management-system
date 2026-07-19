@@ -51,6 +51,13 @@ class BarberResponse(BaseModel):
     specialty: Optional[str] = None
     bio: Optional[str] = None
     is_active: bool
+    phone: Optional[str] = None
+
+class BarberUpdate(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    specialty: Optional[str] = None
+    bio: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -77,6 +84,16 @@ class ServiceResponse(BaseModel):
     description: Optional[str] = None
     available_for_adult: bool
     available_for_child: bool
+    is_active: bool
+
+class ServiceUpdate(BaseModel):
+    name: Optional[str] = None
+    adult_price: Optional[float] = None
+    child_price: Optional[float] = None
+    duration_minutes: Optional[int] = None
+    description: Optional[str] = None
+    available_for_adult: Optional[bool] = None
+    available_for_child: Optional[bool] = None
 
     class Config:
         from_attributes = True

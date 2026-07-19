@@ -4,9 +4,11 @@ import { useAuth } from "../context/AuthContext";
 import { Scissors } from "lucide-react"; // Make sure to import your Scissors icon component
 import loginImage from "../assets/login.jpg"; // reusing the same shop photo as your Landing page hero
 
+
 function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState(null);
@@ -22,8 +24,16 @@ function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      await login(form.email, form.password);
-      navigate(redirectTo); 
+      const loggedInUser = await login(form.email, form.password);
+      // Booking flow takes priority — if we got here via ?redirect=/booking,
+      // honor that. Otherwise, staff go straight to their dashboard.
+      if (redirectTo !== "/") {
+        navigate(redirectTo);
+      } else if (["owner", "barber"].includes(loggedInUser.role)) {
+        navigate("/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(err.response?.data?.detail || "Something went wrong. Please try again.");
     } finally {

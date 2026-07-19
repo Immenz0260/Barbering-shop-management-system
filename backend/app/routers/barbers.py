@@ -62,3 +62,88 @@ def list_barbers(db: Session = Depends(get_db)):
         )
         for barber in barbers
     ]
+
+@router.get("/all", response_model=list[schemas.BarberResponse])
+def get_all_barbers(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_role("owner"))
+):
+    # Unlike GET /barbers/ (public, active-only, for the landing page),
+    # this shows everyone including inactive barbers — the owner needs to
+    # see them to be able to reactivate.
+    barbers = db.query(models.Barber).all()
+
+    return [
+        schemas.BarberResponse(
+            id=barber.id,
+            user_id=barber.user_id,
+            barber_name=barber.user.name,
+            specialty=barber.specialty,
+            bio=barber.bio,
+            is_active=barber.is_active,
+            phone=barber.user.phone
+        )
+        for barber in barbers
+    ]
+
+
+@router.patch("/{barber_id}/toggle-active", response_model=schemas.BarberResponse)
+def toggle_barber_active(
+    barber_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_role("owner"))
+):
+    barber = db.query(models.Barber).filter(models.Barber.id == barber_id).first()
+    if not barber:
+        raise HTTPException(status_code=404, detail="Barber not found")
+
+    barber.is_active = not barber.is_active
+    db.commit()
+    db.refresh(barber)
+
+    return schemas.BarberResponse(
+        id=barber.id,
+        user_id=barber.user_id,
+        barber_name=barber.user.name,
+        specialty=barber.specialty,
+        bio=barber.bio,
+        is_active=barber.is_active
+    )
+
+
+@router.patch("/{barber_id}", response_model=schemas.BarberResponse)
+def update_barber(
+    barber_id: int,
+    data: schemas.BarberUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_role("owner"))
+):
+    barber = db.query(models.Barber).filter(models.Barber.id == barber_id).first()
+    if not barber:
+        raise HTTPException(status_code=404, detail="Barber not found")
+
+    user = barber.user  # the linked User row, via the relationship
+
+    # Only overwrite a field if the owner actually sent a new value for it
+    if data.full_name is not None:
+        user.name = data.full_name
+    if data.phone is not None:
+        user.phone = data.phone
+    if data.specialty is not None:
+        barber.specialty = data.specialty
+    if data.bio is not None:
+        barber.bio = data.bio
+
+    db.commit()
+    db.refresh(barber)
+    db.refresh(user)
+
+    return schemas.BarberResponse(
+        id=barber.id,
+        user_id=barber.user_id,
+        barber_name=user.name,
+        specialty=barber.specialty,
+        bio=barber.bio,
+        is_active=barber.is_active,
+        phone=user.phone
+    )

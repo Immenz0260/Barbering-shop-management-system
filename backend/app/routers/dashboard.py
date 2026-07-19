@@ -125,6 +125,34 @@ def get_barber_stats(
 
 
 
+@router.get("/my-stats", response_model=schemas.BarberStats)
+def get_my_stats(
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_role("barber"))
+):
+    barber = db.query(models.Barber).filter(models.Barber.user_id == current_user.id).first()
+    if not barber:
+        raise HTTPException(status_code=404, detail="Barber profile not found")
+
+    query = apply_date_filter(
+        db.query(models.Booking).filter(models.Booking.barber_id == barber.id),
+        start_date, end_date
+    )
+
+    total_bookings = query.count()
+    total_revenue = query.filter(models.Booking.status == models.BookingStatusEnum.completed) \
+        .with_entities(func.sum(models.Booking.price_charged)).scalar() or 0.0
+
+    return schemas.BarberStats(
+        barber_id=barber.id,
+        barber_name=current_user.name,
+        total_bookings=total_bookings,
+        total_revenue=total_revenue
+    )
+
+
 @router.get("/popular-services", response_model=schemas.PopularServicesResponse)
 def get_popular_services(
     start_date: Optional[str] = Query(None),

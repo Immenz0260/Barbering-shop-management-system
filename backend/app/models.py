@@ -83,6 +83,7 @@ class Service(Base):
     description = Column(String, nullable=True)
     available_for_adult = Column(Boolean, default=True, nullable=False)
     available_for_child = Column(Boolean, default=True, nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
 
     # Bookings that include this service
     bookings = relationship("Booking", back_populates="service")
