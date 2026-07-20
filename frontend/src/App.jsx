@@ -9,6 +9,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import BookingPage from "./pages/BookingPage";  
 import ProtectedRoute from "./components/ProtectedRoute";  
 import DashboardPage from "./pages/DashboardPage";  
+import BarberPortalPage from "./pages/BarberPortalPage";
 
 function App() {
   return (
@@ -30,6 +31,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+          <Route
+                path="/barber-portal"
+                element={
+                  <ProtectedRoute allowedRoles={["barber"]}>
+                    <BarberPortalPage />
+                  </ProtectedRoute>
+                }
+                />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

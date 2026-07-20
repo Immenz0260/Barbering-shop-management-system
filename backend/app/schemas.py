@@ -122,6 +122,7 @@ class BookingResponse(BaseModel):
     time_slot: str
     status: BookingStatusEnum
     source: SourceEnum
+    cancellation_reason: Optional[str] = None  
     created_at: datetime
 
     class Config:
@@ -164,6 +165,9 @@ class BarberStats(BaseModel):
     barber_name: str
     total_bookings: int
     total_revenue: float
+    pending_count: int         
+    completed_count: int         
+    cancelled_count: int  
 
 class BarberStatsResponse(BaseModel):
     barbers: list[BarberStats]

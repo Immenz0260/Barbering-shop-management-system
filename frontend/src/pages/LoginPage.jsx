@@ -29,8 +29,10 @@ function LoginPage() {
       // honor that. Otherwise, staff go straight to their dashboard.
       if (redirectTo !== "/") {
         navigate(redirectTo);
-      } else if (["owner", "barber"].includes(loggedInUser.role)) {
+      } else if (loggedInUser.role === "owner") {
         navigate("/dashboard");
+      } else if (loggedInUser.role === "barber") {
+        navigate("/barber-portal");
       } else {
         navigate("/");
       }

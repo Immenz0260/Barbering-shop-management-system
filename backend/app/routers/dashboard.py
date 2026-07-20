@@ -4,6 +4,7 @@ from sqlalchemy import func
 from typing import Optional
 from datetime import date
 from sqlalchemy import func, case
+from fastapi import HTTPException
 
 from ..database import get_db
 from .. import models, schemas
@@ -145,13 +146,73 @@ def get_my_stats(
     total_revenue = query.filter(models.Booking.status == models.BookingStatusEnum.completed) \
         .with_entities(func.sum(models.Booking.price_charged)).scalar() or 0.0
 
+    pending_count = query.filter(models.Booking.status == models.BookingStatusEnum.pending).count()
+    completed_count = query.filter(models.Booking.status == models.BookingStatusEnum.completed).count()
+    cancelled_count = query.filter(models.Booking.status == models.BookingStatusEnum.cancelled).count()
+
     return schemas.BarberStats(
         barber_id=barber.id,
         barber_name=current_user.name,
         total_bookings=total_bookings,
-        total_revenue=total_revenue
+        total_revenue=total_revenue,
+        pending_count=pending_count,
+        completed_count=completed_count,
+        cancelled_count=cancelled_count
     )
 
+
+@router.get("/my-customers", response_model=schemas.CustomerListResponse)
+def get_my_customers(
+    search: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_role("barber"))
+):
+    barber = db.query(models.Barber).filter(models.Barber.user_id == current_user.id).first()
+    if not barber:
+        raise HTTPException(status_code=404, detail="Barber profile not found")
+
+    query = db.query(
+        models.Booking.customer_phone,
+        models.Booking.customer_name,
+        func.count(models.Booking.id).label("total_visits"),
+        func.coalesce(
+            func.sum(
+                case(
+                    (models.Booking.status == models.BookingStatusEnum.completed, models.Booking.price_charged),
+                    else_=0
+                )
+            ), 0.0
+        ).label("total_spent")
+    ).filter(
+        models.Booking.barber_id == barber.id,
+        models.Booking.status == models.BookingStatusEnum.completed
+    )
+
+    if search:
+        query = query.filter(
+            (models.Booking.customer_name.ilike(f"%{search}%")) |
+            (models.Booking.customer_phone.ilike(f"%{search}%"))
+        )
+
+    query = query.group_by(models.Booking.customer_phone, models.Booking.customer_name)
+    rows = query.all()
+
+    customers = []
+    for row in rows:
+        matched_user = db.query(models.User).filter(
+            models.User.phone == row.customer_phone,
+            models.User.role == models.RoleEnum.customer
+        ).first()
+
+        customers.append(schemas.CustomerDetail(
+            name=row.customer_name,
+            phone=row.customer_phone,
+            email=matched_user.email if matched_user else None,
+            total_visits=row.total_visits,
+            total_spent=row.total_spent
+        ))
+
+    return schemas.CustomerListResponse(customers=customers)
 
 @router.get("/popular-services", response_model=schemas.PopularServicesResponse)
 def get_popular_services(

@@ -45,7 +45,7 @@ function Navbar() {
             <div className="flex items-center gap-4">
               {["owner", "barber"].includes(user.role) && (
                 <Link
-                  to="/dashboard"
+                  to={user.role === "owner" ? "/dashboard" : "/barber-portal"}
                   className="text-base text-muted-foreground tracking-[0.2em] uppercase hover:text-foreground transition-colors"
                 >
                   Dashboard
@@ -79,6 +79,8 @@ function Navbar() {
           )}
         </div>
 
+
+
         <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
           {open ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -97,7 +99,7 @@ function Navbar() {
              <>
               {["owner", "barber"].includes(user.role) && (
                 <Link
-                  to="/dashboard"
+                  to={user.role === "owner" ? "/dashboard" : "/barber-portal"}
                   onClick={() => setOpen(false)}
                   className="text-xs tracking-[0.2em] uppercase text-muted-foreground"
                 >
