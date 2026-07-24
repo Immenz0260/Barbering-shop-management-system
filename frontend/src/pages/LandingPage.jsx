@@ -36,7 +36,7 @@ function LandingPage() {
   return (
     <div>
       {/* Hero Section */}
-<section className="relative min-h-screen flex items-end pb-24 overflow-hidden">
+<section className="relative min-h-screen flex items-end pt-28 pb-24 overflow-hidden">
   {/* ↑ CHANGED: added "relative" and "overflow-hidden", removed "pt-32 px-6" (moved px-6 down to inner div) */}
 
   {/* ← ADD THIS WHOLE BLOCK: the background image + gradient overlay */}
@@ -58,7 +58,7 @@ function LandingPage() {
 
     <h1
       style={{ fontFamily: "'Playfair Display', serif" }}
-      className="text-6xl md:text-9xl font-semibold leading-[0.95] mb-8 max-w-3xl"
+      className="text-4xl sm:text-6xl md:text-9xl font-semibold leading-[0.95] mb-8 max-w-3xl"
     >
       {/* ↑ FIXED: mb-70 → mb-8, max-w-1xl → max-w-3xl */}
       The Art of

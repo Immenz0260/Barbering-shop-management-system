@@ -61,18 +61,26 @@ function DashboardPage() {
   const [editingServiceId, setEditingServiceId] = useState(null);   
   const [serviceEditForm, setServiceEditForm] = useState({});       
   const [submittingServiceEdit, setSubmittingServiceEdit] = useState(false); 
+  const [sortByVisits, setSortByVisits] = useState(false);
+  const [barberStats, setBarberStats] = useState([]);          
+  const [customerStats, setCustomerStats] = useState(null);
+
 
   // Fetch summary stats + services + barbers together when the page loads.
   useEffect(() => {
     async function fetchData() {
-      const [summaryRes, servicesRes, barbersRes] = await Promise.all([
+      const [summaryRes, servicesRes, barbersRes, barberStatsRes, customerStatsRes] = await Promise.all([
         api.get("/dashboard/summary"),
         api.get("/services/"),
         api.get("/barbers/"),
+        api.get("/dashboard/by-barber"),        
+        api.get("/dashboard/customers"),
       ]);
       setSummary(summaryRes.data);
       setServices(servicesRes.data);
       setBarbers(barbersRes.data.filter((b) => b.is_active));
+      setBarberStats(barberStatsRes.data.barbers);  
+      setCustomerStats(customerStatsRes.data);   
       setLoading(false);
     }
     fetchData();
@@ -326,6 +334,54 @@ async function fetchCustomers(search = "") {
                 </div>
               ))}
             </div>
+
+            {/* Shop-wide customer stats */}
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              <div className="bg-card border border-border p-6">
+                <div className="text-xs text-muted-foreground tracking-[0.15em] uppercase mb-2">Total Customers</div>
+                <div style={{ fontFamily: "'Playfair Display', serif" }} className="text-3xl font-semibold">
+                  {customerStats.total_unique_customers}
+                </div>
+              </div>
+              <div className="bg-card border border-border p-6">
+                <div className="text-xs text-muted-foreground tracking-[0.15em] uppercase mb-2">New Customers</div>
+                <div style={{ fontFamily: "'Playfair Display', serif" }} className="text-3xl font-semibold text-primary">
+                  {customerStats.new_customers}
+                </div>
+              </div>
+              <div className="bg-card border border-border p-6">
+                <div className="text-xs text-muted-foreground tracking-[0.15em] uppercase mb-2">Returning Customers</div>
+                <div style={{ fontFamily: "'Playfair Display', serif" }} className="text-3xl font-semibold">
+                  {customerStats.returning_customers}
+                </div>
+              </div>
+            </div>
+
+            {/* Per-barber breakdown */}
+            <div className="bg-card border border-border p-7">
+              <h3 style={{ fontFamily: "'Playfair Display', serif" }} className="text-xl font-medium mb-7">
+                Performance by Barber
+              </h3>
+              <div className="space-y-4">
+                {barberStats.map((b) => (
+                  <div key={b.barber_id} className="flex items-center justify-between pb-4 border-b border-border last:border-0 last:pb-0">
+                    <div>
+                      <div className="text-sm font-medium">{b.barber_name}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        {b.pending_count} pending · {b.completed_count} completed · {b.cancelled_count} cancelled
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div style={{ fontFamily: "'DM Mono', monospace" }} className="text-sm text-primary font-medium">
+                        GHS {b.total_revenue}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{b.total_bookings} bookings</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -464,6 +520,15 @@ async function fetchCustomers(search = "") {
               className="w-full bg-card border border-border px-4 py-3 mb-6 text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary transition-colors"
             />
 
+            <button
+                onClick={() => setSortByVisits(!sortByVisits)}
+                className={`text-xs tracking-[0.15em] uppercase mb-6 px-3 py-1.5 border transition-colors ${
+                  sortByVisits ? "border-primary text-primary bg-card" : "border-border text-muted-foreground hover:border-primary/40"
+                }`}
+              >
+                Sort by Most Visits {sortByVisits ? "✓" : ""}
+              </button>
+
             {loadingCustomers ? (
               <p className="text-muted-foreground text-sm">Searching...</p>
             ) : (
@@ -481,7 +546,9 @@ async function fetchCustomers(search = "") {
                       </div>
                     ))}
                   </div>
-                  {customers.map((c, i) => (
+                  {[...customers]
+                    .sort((a, b) => (sortByVisits ? b.total_visits - a.total_visits : 0))
+                    .map((c, i) => (
                     <div
                       key={c.phone}
                       className={`grid grid-cols-12 gap-4 px-6 py-4 hover:bg-secondary transition-colors items-center ${
@@ -520,7 +587,7 @@ async function fetchCustomers(search = "") {
 
             {/* Existing barbers list */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-{allBarbers.map((barber) =>
+             {allBarbers.map((barber) =>
                 editingBarberId === barber.id ? (
                   <form
                     key={barber.id}

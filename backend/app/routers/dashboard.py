@@ -114,12 +114,18 @@ def get_barber_stats(
             start_date, end_date
         ).scalar() or 0.0
 
+        pending_count = booking_query.filter(models.Booking.status == models.BookingStatusEnum.pending).count()
+        completed_count = booking_query.filter(models.Booking.status == models.BookingStatusEnum.completed).count()
+        cancelled_count = booking_query.filter(models.Booking.status == models.BookingStatusEnum.cancelled).count()
 
         results.append(schemas.BarberStats(
             barber_id=barber.id,
             barber_name=barber.user.name,
             total_bookings=total_bookings,
-            total_revenue=total_revenue
+            total_revenue=total_revenue,
+            pending_count=pending_count,
+            completed_count=completed_count,
+            cancelled_count=cancelled_count
         ))
 
     return schemas.BarberStatsResponse(barbers=results)
